@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Users List</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        #one {
+            max-width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 5px;
+            background: white;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 600px) {
+            #one {
+                padding: 10px;
+            }
+        }
+
+        h1 {
+            font-size: 2.5vw;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            font-size: 1.5vw;
+        }
+
+        a {
+            color: black
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            z-index: 9999;
+            box-sizing: border-box;
+        }
+
+        .popup-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        @media (max-width: 600px) {
+            .popup-content {
+                width: 95%;
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="one">
+        <h3>ActiveUsers</h3>
+        <ul>
+            <% Object.keys(active_users).forEach(id => { %>
+                <li>ID: <a onclick="redirectToDetails('<%= id %>')"><%= id %> </a> Name: <%= active_users[id] %></li>
+            <% }); %>
+        </ul>
+
+        <button onclick="gotohome()">Logout</button>
+
+        <div id="popup" class="popup">
+            <h2>JSON Data <button onclick="closePopup()">X</button></h2>
+            <h4 id="jsonData"></h4>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        function redirectToDetails(id) {
+            socket.emit('fetch-data', id)
+            socket.on('user-details', function (user) {
+                console.log('Received user details:', user);
+                document.getElementById("jsonData").innerText = JSON.stringify(user, null, 2);
+                document.getElementById("popup").style.display = "block";
+            });
+        }
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        function gotohome() {
+            window.location.href = '/logout'
+        }
+    </script>
+</body>
+</html>

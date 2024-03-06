@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Registration</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="./css/main.css" />
+<!-- Include Socket.IO library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#form1").submit(function (event) {
+          event.preventDefault();
+		  const mobileNumber = $("#mobileNumber").val();
+      const password = $("#password").val();
+
+      if (mobileNumber.length !== 10 || isNaN(mobileNumber)) {
+        document.getElementById("check").innerHTML = "Invalid mobile number. Please enter a 10-digit number.";
+        return;
+      }
+
+      if (password.length < 6 || !(/[a-z]/.test(password)) || !(/[A-Z]/.test(password)) || !(/[!@#$%^&*(),.?":{}|<>]/.test(password))) {
+        document.getElementById("check").innerHTML = "Password must be at least 6 characters and contain at least one uppercase letter, one lowercase letter, and one special character.";
+        return;
+      }
+
+          $.ajax({
+            type: "POST",
+            url: "/",
+            data: $("#form1").serialize(),
+            dataType: "json",
+            success: function (response) {
+              //alert("a");
+              //console.log(response.Success);
+              $("#form1")[0].reset();
+
+              document.getElementById("check").innerHTML = response.Success;
+              //ADD THIS CODE
+              setTimeout(function () {
+                document.getElementById("check").innerHTML = "";
+              }, 3000);
+              if (response.Success == "You are regestered,You can login now.") {
+                document.getElementById("aa").click();
+              }
+            },
+            error: function () {},
+          });
+        });
+      });
+      const socket = io();
+// Listen for user connection
+socket.on('userConnected', (data) => {
+  console.log('User connected:', data.userId);
+  // Handle user connected (e.g., update active user list)
+});
+
+// Listen for user disconnection
+socket.on('userDisconnected', (data) => {
+  console.log('User disconnected:', data.userId);
+  // Handle user disconnected (e.g., update active user list)
+});
+    </script>
+  </head>
+  <body>
+    <div class="col-md-4 col-md-offset-4">
+      <div>
+        <p>Register Now</p>
+      </div>
+      <div class="form-group">
+        <form id="form1" method="post">
+          <input
+            type="text"
+            name="firstName"
+            placeholder="FirstName"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="text"
+            name="lastName"
+            placeholder="Lastname"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="number"
+			id="mobileNumber"
+            name="mobileNumber"
+            placeholder="mobileNumber"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="text"
+            name="street"
+            placeholder="Street"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="text"
+            name="city"
+            placeholder="City"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="text"
+            name="state"
+            placeholder="State"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="text"
+            name="country"
+            placeholder="Country"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="email"
+            name="email"
+            placeholder="E-mail"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="password"
+			id="password"
+            name="password"
+            placeholder="Password"
+            required=""
+            class="form-control"
+          /><br />
+          <input
+            type="password"
+            name="passwordConf"
+            placeholder="Confirm Password"
+            required=""
+            class="form-control"
+          /><br />
+          <input type="submit" value="Register" class="btn btn-success" />
+        </form>
+      </div>
+
+      <div class="mssg bg-danger">
+        <span id="check"></span>
+      </div>
+      <div>
+        <span>Already Registered! <a href="/login">Login</a></span>
+      </div>
+      <div id="LangTable"><a href="/login" id="aa"></a></div>
+    </div>
+  </body>
+</html>
