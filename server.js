@@ -3,8 +3,9 @@ const app = express();
 const secretKey = 'your-secret-key';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+const socketIO = require('socket.io');
+const http = require('http').createServer(app);
+const io = socketIO(http); // Change this line// Change this line
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const mongoose = require('mongoose');
@@ -77,7 +78,7 @@ app.post('/login', async function (req, res, next) {
         // Store the token in the session
         req.session.token = token;
         req.session.userId = user._id;
-        active_users[user._id] = user.firstName;
+        active_users[user._id] =user.firstName;
         res.send({ "Success": "Success!" });
       } else {
         res.send({ "Success": "Wrong password!" });
@@ -120,7 +121,7 @@ io.on("connection", (socket) => {
     console.log("Line 199", userId);
     try {
       // Fetch user details from MongoDB using Mongoose
-      const user = await UserModel.findById(userId);
+      const user = await User.findById(userId);
       if (!user) {
         console.log("User not found");
         socket.emit("user-not-found", userId); // Emit an event indicating that user is not found
@@ -149,8 +150,25 @@ app.get('/online-users', (req, res) => {
   res.render("data", { active_users });
   console.log({active_users});
 });
+
+app.get("/users", async (req, res) => {
+  const userId = req.body;
+  console.log("line 215", userId);
+  try {
+    // Fetch user details from MongoDB using Mongoose
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send("User not found");
+    }
+    // res.json(user);
+    res.json(user); // Send user details as JSON response
+  } catch (err) {
+    console.error("Error fetching user details:", err);
+    res.status(500).send("Internal Server Error");
+  }
+});
 // Start the server and listen on a port
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, function () {
+http.listen(PORT, function () {
   console.log(`Server is started on http://127.0.0.1:${PORT}`);
 });
