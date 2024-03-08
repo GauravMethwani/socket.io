@@ -136,7 +136,7 @@
         function redirectToDetails(id) {
             socket.emit('fetch-data', id);
 
-            socket.on('user-details', async function (user) {
+            socket.on('user-details',  function (user) {
                 console.log('Received user details:', user);
 
                 // Extracting relevant information
@@ -153,7 +153,7 @@
                 };
 
                 // Displaying the extracted information
-                document.getElementById("jsonData").innerText = await JSON.stringify(userDetails, null, 2);
+                document.getElementById("jsonData").innerText =  JSON.stringify(userDetails, null, 2);
                 document.getElementById("popup").style.display = "block";
             });
         }
